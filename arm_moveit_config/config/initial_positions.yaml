@@ -1,0 +1,11 @@
+# Default initial positions for sgr's ros2_control fake system
+
+initial_positions:
+  joint1: 0
+  joint2: 1.39
+  joint3: -1.39
+  joint4: 0
+  joint5: 0
+  joint6: 0
+  joint_gripper_left: 0
+  joint_gripper_right: 0

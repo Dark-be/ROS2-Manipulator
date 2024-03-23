@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: arm_description
+    relative_path: urdf/sagittarius_descriptions.urdf
+  srdf:
+    relative_path: config/sgr.srdf
+  package_settings:
+    author_name: darkbe
+    author_email: 2954523953@qq.com
+    generated_timestamp: 1711119506
