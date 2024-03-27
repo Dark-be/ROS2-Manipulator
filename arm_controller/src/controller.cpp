@@ -49,12 +49,11 @@ public:
 
     arm_move_group_->execute(arm_plan);
 
-    
   }
 private:
   void ArmTargetCallback(const std_msgs::msg::Float32MultiArray::SharedPtr msg){
     RCLCPP_INFO(this->get_logger(), "Received arm target message:");
-    if(msg->data.size() != 6){
+    if(msg->data.size() < 6){
       RCLCPP_ERROR(this->get_logger(), "Invalid arm target message");
       return;
     }
@@ -65,10 +64,10 @@ private:
     Eigen::Quaterniond q = Eigen::AngleAxisd(msg->data[5], Eigen::Vector3d::UnitZ())
       * Eigen::AngleAxisd(msg->data[4], Eigen::Vector3d::UnitY())
       * Eigen::AngleAxisd(msg->data[3], Eigen::Vector3d::UnitX());
-    arm_target_pose.orientation.w = 1;
-    arm_target_pose.orientation.x = 0;
-    arm_target_pose.orientation.y = 0;
-    arm_target_pose.orientation.z = 0;
+    arm_target_pose.orientation.w = q.w();
+    arm_target_pose.orientation.x = q.x();
+    arm_target_pose.orientation.y = q.y();
+    arm_target_pose.orientation.z = q.z();
     RCLCPP_INFO(this->get_logger(), "%f %f %f %f %f %f",
       arm_target_pose.position.x, arm_target_pose.position.y, arm_target_pose.position.z,
       arm_target_pose.orientation.x, arm_target_pose.orientation.y, arm_target_pose.orientation.z);

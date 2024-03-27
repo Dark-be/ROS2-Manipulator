@@ -8,6 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(control_msgs REQUIRED)
@@ -36,7 +37,7 @@ set(dependencies sagittarius_sdk pthread boost_system boost_thread)
 
 add_executable(sagittarius_example src/sagittarius_example.cpp)
 target_link_libraries(sagittarius_example ${dependencies})
-ament_target_dependencies(sagittarius_example rclcpp sensor_msgs rclcpp_action control_msgs)
+ament_target_dependencies(sagittarius_example rclcpp sensor_msgs rclcpp_action control_msgs std_msgs)
 
 ament_package()
 

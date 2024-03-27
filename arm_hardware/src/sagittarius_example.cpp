@@ -5,6 +5,7 @@
 #include "arm_hardware/modern_robotics.h"
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <control_msgs/action/follow_joint_trajectory.hpp>
+#include <std_msgs/msg/float32.hpp>
 
 using FollowJointTrajectory = control_msgs::action::FollowJointTrajectory;
 using GoalHandleFollowJointTrajectory = rclcpp_action::ServerGoalHandle<FollowJointTrajectory>;
@@ -20,6 +21,10 @@ public:
 
         joint_states_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>(
             "joint_states", 10
+        );
+
+        sub_ = this->create_subscription<std_msgs::msg::Float32>(
+            "hand_target", 10, std::bind(&SagittariusNode::HandTargetCallback, this, std::placeholders::_1)
         );
         using namespace std::placeholders;  // NOLINT
 
@@ -78,12 +83,11 @@ private:
             feedback->joint_names = goal->trajectory.joint_names;
 
             auto current_point = goal->trajectory.points[trjIndex];
-            float joint_states[7];
-            for(int i = 0; i < 7; i++){
+            float joint_states[6];
+            for(int i = 0; i < 6; i++){
                 joint_states[i] = current_point.positions[i];
             }
             sar_->SetAllServoRadian(joint_states);
-            sar_->arm_set_gripper_linear_position(current_point.positions[6]*2);
 
             goal_handle->publish_feedback(feedback);
             if(goal_handle->is_canceling()){
@@ -138,8 +142,14 @@ private:
         joint_states_publisher_->publish(joint_states);
     }
 
+    void HandTargetCallback(const std_msgs::msg::Float32::SharedPtr msg){
+        float target = msg->data / 100 * 0.064;
+        sar_->arm_set_gripper_linear_position(target);
+    }
+
     rclcpp_action::Server<FollowJointTrajectory>::SharedPtr action_server_;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_states_publisher_;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr sub_;
     rclcpp::TimerBase::SharedPtr js_pub_timer_;
 
     std::shared_ptr<sdk_sagittarius_arm::SagittariusArmReal> sar_;
